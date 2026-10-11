@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+#gemfile dosyası oluşturmak için bundle init yaz
+#Oluşan Gemfile dosyasını Vs Code üzerinde aç ve kullanmak istediğin gem'leri (örneğin HTTP istekleri için httparty veya terminal renkleri için coloeize) ekle
+gem "httparty"
+gem "colorize"
+gem "dotenv" #env dosyasını okuyabilmk için
+
+# gem "rails"

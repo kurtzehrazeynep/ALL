@@ -1,0 +1,275 @@
+#Ücretsiz APİ aldım ama bunu yine de Siteye gümmek güvenli mi
+
+ÖNEMLİ NOT;
+export WEATHER_API_KEY="senin_api_anahtarin" HANGİ DOSYAYA YAZICAM
+
+YÖNTEM 1:KALICI ORTAM DEĞİKENİ (LİNUX/UBUNTU TERMİNALİ İÇİN)
+eğer bu anahtarın bilgisayarındaki tüm terminal pencerelerinde kalıcı olmasını istiyorsan:
+1.Terminalde ev (home) dizinine git ve bash yapılandırma dosyanı aç:
+nano ~/.bashrc
+(Eğer Zsh kullanıyorsan nano~/.zshrc komutunu yazmalısın)
+2.Dosyanın en altına in ve şu satırı ekle:
+export WEATHER_API_KEY="kopyaladiğin_api_anahtari"
+3.Dosyayı kaydet (Ctrl+0,ardından Enter) ve çık (Ctrl X).
+4.Değişikliklerin geçerli olması için terminalde şu komutu çalıştır:
+source ~/bashrc
+
+YÖNTEM 2:PROJE İÇERİSİNDE .ENV DOSYASI KULLANMAK (ÖNERİLEN)
+Yazılım projelerinde API anahtarını doğrudan sisteme kaydetmek yerine proje klasörünün içinde .env adında gizli bir dosya tutmak çok daha yaygın ve güvenlidir.
+1.Projenin ana dizininde bir .env dosyası oluştur:
+touch .env 
+2.İçine anahtarını şu şekilde yaz ve kaydet:
+WEATHER_API_KEY="kopyaladiğin_api_anahtari"
+3.Ruby kodunda bu dosyayı okuyabilmek için dotenv gem'ini kullanabilirsin.Böylece anahtarın sadece bu projeye özel kalır ve yanlışlıkla github'a yüklenmez (Github' a yüklememek için .gitignore dosyasına da .env yazmalısın)
+
+
+1.ADIM:GÜVENLİK VE ORTAM DEĞİŞKENLERİ (ENVİROMENT VARİABLES)
+Mantık:API anahtarını veya şifreleri doğrudan kodun içine yazmak güvenlik açıklarına yol açar.Bu yüzden programımız ilk çalıştığında gizli bir kasadan (.env dosyasından) anahtarımızı okumalıdır.
+Nasıl yaparsın?
+Projende dotenv gem'ini dahil edip Dotenv.load komutunu çalıştırırsın.Böylece Ruby,env dosyasındaki WEATHER_API_KEY değerini ENV['WEATHER_API_KEY'] şeklinde okuyabilir hale gelir.
+
+2.ADIM:KULLANICIDAN GİRDİ ALMAK CLI INPUT
+Mantık:Uygulamanın statik değil,dinamik olması gerekir.Yani kullanıcıya hangi şehrin hava durumunu merak ettiğini sormalı ve klavyeden girdiği değeri yakalamalısın.
+Nasıl yaparsın?
+print veya puts ile ekrana soru yazdırırsın.
+gets.chomp komutu ile kullanıcının klavyeden yazdığı metni alır ve bir değişkene (örneğin city değişkenine) atarsın. (chomp fonksiyonu,enter tuşuna basıldığında oluşan boşluk/satır sonu karakterini temizler.)
+
+3.ADIM:API URL'SİNİ OLUŞTURMAK VE İSTEK ATMAK (HTTP REQUEST)
+Mantık:Elde ettiğin şehir adını ve API anahtarını,hava durumu sağlayıcısının (OpenWeatherMap) kabul edeceği standart bir web adresine (URL) yerleştirmelisin.Ardından internet üzerinden bu adrese bir "GET" isteği gönderip sunucudan yanıt beklemelisin.
+
+Nasıl Yaparsın?
+Ruby'de string interpolasyonu ("..." içinde #{degisken} ) kullanarak istek atarsın ve gelen cevabı bir değişkene kaydedersin.
+httparty gem'inin HTTParty.get(url) metodunu kullanarak istek atarsın ve gelen cevabı bir değişkene kaydedersin.
+
+4.ADIM:GELEN VERİYİ ÇÖZÜMLEMEK (JSON PARSİNG)
+Mantık:API sana ham bir metin (JSON formatında) gönderir.Ruby'nin bu metin içerisindeki sıcaklık veya nem değerlerini doğrudan anlaması zordur;bu yüzden bu metni Ruby'nin veri yapılarına (Hash/Sözlük) dönüştürmelisin.
+Nasıl Yaparsın?
+Ruby'nin yerleşik JSON.parse(response.body) komutunu kullanırsın.
+Artık elimizde bir Hash vardır ve anahtarları kullanarak verilere ulaşabilirsin(Örneğin data["main"]["temp"] sıcaklık  verir.)
+
+5.ADIM:SONUÇLARI GÖSTERMEK VE HATA YÖNETİMİ (OUTPUT & ERROR HANDLİNG)
+Mantık:Kullanıcı yanlış bir şehir adı yazabilir veya internet bağlantısı kopabilir.Programın aniden çökmemesi (hata verip kapanmaması) için sunucudan gelen yanıtın kodunu kontrol etmelisin.Eğer her şey yolundaysa bilgileri ekrana şık bir şekilde yazdırmalısın.
+Nasıl yaparsın?
+response.code == 200 (başarılı) olup olmadığını kontrol eden bir if/else bloğu kurarsın
+Başarılıysa verileri terminale yazdırır,değilse kullanıcıya nazik bir hata mesajı gösterirsin
+
+
+#############################################################################################################
+
+*************.env (Enviroment Variables - Çevre Değikenleri)***********
+
+Ne işe yarar:Projede gizli tutulması gereken hassas bilgileri (örneğin hava durumu API anahtarlarını,şifreler,veritabanı bağlantı adresleri) güvenli bir şekilde saklamak için kullanılır.
+Neden önemlidir:Bu tür bilgileri doğrudan kodun içine (weather_client.rb gibi) yazmak güvenik açığı yaratır.
+.env dosyası,bu verileri koddan izole eder ve Git gibi versiyon kontrol sistemlerine yüklemez (.gitignore içine eklenir).
+dotenv gemi yardımıyla uygulama çalışırken bu değişkenler okunur.
+
+.gitignore içine ekleme nasıl:
+.env dosyasını .gitignore içine eklemek çok basit.
+Projenin ana klasöründe .gitignore adında bir dosya oluştur veya varsa aç.
+içine şu satırı ekle:
+.env
+Örnek Proje Yapısı:
+.
+weather_project/
+├── .env
+├── .gitignore
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── lib/
+    └── weather_client.rb
+.gitignore:
+.env
+Böylece Git'e:
+.env dosyasını takip etme,Github'a gönderme  demiş olursun.
+NEDEN:
+.env içinde örneğin:
+WEATHER_API_KEY=498G57JJX4HHZ49 olabilir.
+Eğer .env Github'a yüklenirse API anahtarın başkaları tarafından görülebilir.  .gitignore bunu önlemek için kullanılır.
+***TERMİNALDEN OLUŞTURULMAK İSTENİRSE 
+Linux/macOS:
+touch .gitignore
+sonra:
+echo ".env" >> .gitignore
+---->echo ve >> burada ne anlama geliyor
+Bu komut,terminalde (komut satırında) Git projelerinde sıkça kullanılan bir dosya düzenleme ve güvenlik önlemidir.
+Komutun Tam Olarak Yaptığı Şey:
+.gitignore adlı dosyanın en sonuna ".env" satırını ekler (Eğer .gitignore dosyası yoksa otomatik olarak oluşturur ve içine yazar.)
+echo ".env" : Belirtilen metni (.env) ekrana yazdıran komuttur.
+>> (Append/Ekleme Operatörü):Sol taraftaki komutun çıktısını alır ve sağdaki dosyanın en sonuna ekler.
+(Eğer tekli > Kullandıysanız, dosyadaki tüm eski yazılar silinip sadece env yazdırılır;çift >> kullanıldığı için mevcut dosya içeriği korunur ve altına eklenir).
+.gitignore: Git versiyon kontrol sisteminin,Projenizdeki hangi dosya ve klasörleri takip etmeyeceğini (Yani Github'a yüklemeyeceğini) belirten özel bir yapılandırma dosyasıdır.
+Önemli: .gitignore dosyasına .env yazmak .env dosyasını silmez Sadece Git'in onu takip etmesini engeller.
+Neden böyle bir şey yapılır?
+.env dosyaları genellikle veritabanı şifreleri,API anahtarları ve gizli token'lar gibi hassas bilgileri barındırır.
+Bu komut, .env dosyasınızı .gitignore listesine ekleyerek,projeyi GitHub'a gönderdiğinizde bu gizli bilgilerin yanlışlıkla internettesızmasını engeller.
+
+**********GEMFİLE**********
+Ne işe yarar:RUby projelerinde kullanılan dış kütühanelerin (gemlerin) ve sürümlerin listelendiği ana yapılandırma dosyasıdır.
+Neden Önemlidir:Projede hangi kütüphanelerin (örneğin HTTP istekleri için net-http veya faraday, ortam değişkenleri için dotenv ) kullanılacağını bundler paket yöneticisine söyler
+**Gemfile,Ruby projesinin hangi dış kütüphanelere ihtiyaç duyduğunu söyleyen dosyadır.
+1.Gem Nedir?
+Gem,Ruby için hazırlanmış bir kütüphane/paket demektir.
+Örneğin hava durumu uygulamamızda API'ye istek göndermek için httparty kullanabiliriz.
+gem "httparty"
+Burada Ruby'ye:
+"Bu projede HTTParty kütüphanesini kullanacağım" demiş oluyoruz.
+2.Gemfile Nedri?
+Gemfile,projede kullanılacak gem'leri listelediğimiz dosyadır.
+Örneğin:
+source "https://rubygems.org"
+gem "httparty"
+gem "dotenv"
+Burada iki tane gem kullanacağımızı söylüyoruz:
+*httparty->HTTP/API istekleri yapmak için 
+*dotenv -> .env dosyasındaki çevre değişkenlerini kullanmak için 
+Yani kabaca:
+Gemfile
+   ↓
+Projede hangi gem'ler kullanılacak?
+   ↓
+httparty
+dotenv
+3.Bundler Nedir?
+Bundler,Ruby projelerindeki gem'leri yöneten araçtır.
+Gemfile'a şunu yazdığımızı düşün:
+gem "httparty"
+gem "dotenv"
+Sonra Terminalde:
+bundle install  yazıyoruz
+Bundler,Gemfile'a bakıp gerekli gem'leri yükler.
+Gemfile
+   ↓
+" httparty lazım "
+" dotenv lazım "
+   ↓
+bundle install
+   ↓
+Gem'ler yüklenir
+4.Gem Sürümü nedir?
+Bir gemin farklı sürümleri olabilir.
+Örneğin:
+gem "httparty", "0.22.0"
+Burada;
+httparty gem'inin 0.22.0 sürümünü kullan. 
+demiş oluyoruz.
+Bazen belirli bir sürüm yerine bir aralık da belirleyebiliriz.
+gem "httparty", "-> 0.22"
+Bu, uyumlu 0.22.x sürümlerini kullanmaya izin verir.
+Neden Gemfile Önemli?
+Çünkü projeyi başka bir bilgisayara götürdüğümüzde hangi gem'lerin gerektiğini tekrar tekrar söylememiz gerekmez.
+Ötneğin projemizde:
+gem "httparty"
+gem "dotenv"
+var.
+Başka bir bilgisayarda proje açıldığında:
+bundle install
+denir ve Bundler Gemfile'a bakarak gerekli paketleri kurar.
+6.Gemfile.lock ne?
+Burada öenmli bir ayrım var:
+Gemfile:
+Hangi gem'lere ihtiyacım var?
+Gemfile.lock
+Tam olarak hangi sürümleri kuruldu?
+örneğin Gemfile:
+gem "httparty"
+gem "dotenv"
+Gemfile.lock ise kullanılac kesin sürümleri ve bunların bağımlılıklarını kaydeder.
+Bu yüzden ikisi aynı şey değildir.
+Gemfile
+↓
+İhtiyaçlar
+
+Gemfile.lock
+↓
+Gerçekte kullanılan kesin sürümler
+
+*********GEMFİLE.LOCK***********
+Ne işe yarar:Projelerde yüklü olan gem'lerin kesin ve tam sürümlerinin kilitlendği (sabitlendği) dosyadır.
+Neden Önemlidir:Gemfile içinde genellikle sürüm aralıkları verilirken,Gemfile.lock o an projeye indirilen spesifik alt bağımlılık sürümlerini bile kayda geçer.
+Böylece projeyi başka bir bilgisayara taşıdığında veya ekip arkadaşlarınla çalışırken herkesin aynı kütüphane sürümleriyle çalışması garanti edilir (buna dterministik kurulum denir.)
+1.Gemfile.lock Nedir?
+Gemfile.lock,projede kullanılan gem'lerin tam sürümlerini kaydeden dosyadır.
+Örneğin Gemfile içinde:
+gem "httparty" yazmış olabilirsin.
+Bu kabaca:
+Bana HTTParty gem'ini getir demektir
+Ama hangi sürümün getireleceği belirtilmemiş olabilir.
+Gemfile.lock ise örneğin şunu kaydedebilir:
+httparty (0.23.1)
+yani:
+"Bu projede HTTParty'nin 0.23.1 sürümü kullanılıyor."
+2.Kesin sürüm Ne demek:
+Kesin sürüm, tam olarak hangi versiyonun kullanılacağının belli olmasıdır.
+Örneğin:
+httparty (0.23.1)
+Burada:
+0-> ana sürüm
+23-> alt sürüm
+1-> düzeltme sürümü 
+3.Alt bağımlılık Nedir:
+Asıl önemli noktalardan biri bu.
+Sen:
+gem "httparty"
+diyorsun.
+Ama HTTParty'nin çalışabilmesi için bşka gem'lere de ihtiyacı olabilirç
+Örneğin hayali olarak:
+Senin projen
+   ↓
+HTTParty
+   ↓
+Gem A
+   ↓
+Gem B
+Sen Sadece:
+gem "httparty" yazarsın.
+Ama HTTParty'nin ihtiyaç duyduğu Gem A ve Gem B gibi gem'lerde yüklenir.
+Bunlara bağımlılık denir.
+HTTParty'nin kulllandığı gem'in kullandığı başka gem'e ise alt bağımlılık diyebiliriz.
+4.Gemfile Neden Tek başına Yeterli Değildir?
+Diyelim Gemfile şöyle
+gem "httparty"
+gem "dotenv"
+Bugün bilgisayrarında:
+httparty 0.23.1
+dotenv 3.1.8
+yüklendi
+Birkaç ay sonra başka bir bilgisayarda proje kuruluyor.
+Eğer yeni sürümler çıkmıssa
+httparty 0.24.0
+dotenv 3.2.0
+gibi farklı sürümler kurulabilir.
+Bu da projede farklı davranışlara neden olabilir.
+5.Gemfile.lock burada ne yapıyor?
+Gemfile.lock kullanılan sürümleri kaydeder:
+httparty (0.23.1)
+dotenv (3.1.7)
+Böylece başka bilgisayarda proje kurulduğunda Bundler:
+Bu projede daha önce şu sürümler belirlenmiş.
+diyerek lock dosyasındaki sürümlere göre kurulum yapar.
+"Deterministik kurulum" ne demek?
+Kelime biraz zor görünüyor ama fikir basit:
+Aynı girdiler -> Aynı sonuç.
+Örneğin:
+Bilgisayar A
+Gemfile.lock
+    ↓
+httparty 0.23.1
+dotenv 3.1.8
+ve:
+Bilgisayar B
+Aynı Gemfile.lock
+    ↓
+httparty 0.23.1
+dotenv 3.1.8
+Yani iki bilgisayardada mümkün olduğunca aynı bağımlılık sürümleri kullanılır.
+Kısaca aklında şöyle tut:
+Gemfile
+   ↓
+"Projede hangi gem'lere ihtiyacım var?"
+
+Gemfile.lock
+   ↓
+"Tam olarak hangi sürümleri kullanıyorum?"
+Gemfile = İstek listesi
+Gemfile.lock = kilitlenmiş gerçek sürümler

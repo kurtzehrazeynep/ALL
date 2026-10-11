@@ -1,0 +1,6 @@
+    Genel Olarak Herhangi Bir API: İnternette arama yaparken servis adının yanına direkt API documentation yazman yeterlidir. (Örneğin Spotify API documantation, Github API docs)
+    karşına çıkan klavuzlarda şunlaı bulursun:
+    1.Base URL/Endopoint: İstek atacağın internet adresi 
+    2.Parameters (Parametreler):Göndermen gereken zorunlu veya isteğe bağlı bilgiler (örneğin şehir adı,API anahtarı,dil seçeneği).
+    3.Response Fortmat (Cevap Formatı):API'nin sana geri döndüreceği verinin yapısı (genellikle JSON formatındadır ve içinde sıcaklık, nem gibi bilgilerin hangi anahtarlarla geleceği yazar).
+    
