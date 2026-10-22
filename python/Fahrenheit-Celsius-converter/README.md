@@ -25,15 +25,16 @@ A simple, lightweight, and interactive command-line interface (CLI) program writ
 ## Usage
 
 When you run the script, you will see the following menu:
-
-----------------------------------------
-   press F for Fahrenheit to Celsius    
-   press C for Celsius to Fahrenheit    
-----------------------------------------
+```
+  ----------------------------------------
+    press F for Fahrenheit to Celsius    
+    press C for Celsius to Fahrenheit    
+  ----------------------------------------
     press Q for quit            
-----------------------------------------
-  select the action you want to perform.
-----------------------------------------
+  ----------------------------------------
+    select the action you want to perform.
+  ---------------------------------------- 
+
 
 Type F to convert Fahrenheit to Celsius.
 
