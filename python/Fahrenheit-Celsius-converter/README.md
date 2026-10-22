@@ -33,7 +33,7 @@ When you run the script, you will see the following menu:
             press Q for quit            
 ----------------------------------------
   select the action you want to perform.
-  
+----------------------------------------
 
 Type F to convert Fahrenheit to Celsius.
 
