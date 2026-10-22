@@ -32,6 +32,6 @@ A simple, interactive command-line number guessing game built with Python. The p
 2.Enter your guess when prompted.
 3.The game will guide you:
 ```
-📉 lower $\rightarrow$ The secret number is smaller than your guess.
-📈 Upper $\rightarrow$ The secret number is greater than your guess.
+📉 lower  The secret number is smaller than your guess.
+📈 Upper  The secret number is greater than your guess.
 Keep guessing until you find the correct number and see your total score!
