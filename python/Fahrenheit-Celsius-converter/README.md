@@ -30,7 +30,7 @@ When you run the script, you will see the following menu:
    press F for Fahrenheit to Celsius    
    press C for Celsius to Fahrenheit    
 ----------------------------------------
-            press Q for quit            
+    press Q for quit            
 ----------------------------------------
   select the action you want to perform.
 ----------------------------------------
